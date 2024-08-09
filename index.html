@@ -1,0 +1,382 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pong Game</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      background-color: #1e1e1e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      background-color: #2b2b2b;
+      border: 2px solid #fff;
+    }
+    #controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="pongCanvas" width="800" height="400"></canvas>
+  <div id="controls">
+    <button class="button" id="startGame">Start Game</button>
+    <button class="button" id="restartGame">Restart Game</button>
+    <button class="button" id="toggleDifficulty">Difficulty: Easy</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('pongCanvas');
+    const ctx = canvas.getContext('2d');
+    let ball, player, computer, isGameRunning, gameDifficulty, lives, startTime, elapsedTime;
+
+    function initializeGame() {
+      ball = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 10,
+        speedX: 5,
+        speedY: 5,
+        color: "#fff"
+      };
+
+      const paddleWidth = 10;
+      const paddleHeight = 100;
+
+      player = { x: 10, y: (canvas.height - paddleHeight) / 2, width: paddleWidth, height: paddleHeight, color: "#fff" };
+      computer = { x: canvas.width - paddleWidth - 10, y: (canvas.height - paddleHeight) / 2, width: paddleWidth, height: paddleHeight, color: "#fff" };
+
+      isGameRunning = false;
+      gameDifficulty = 'easy';
+      lives = 3;
+      startTime = 0;
+      elapsedTime = 0;
+
+      document.getElementById('toggleDifficulty').innerText = `Difficulty: Easy`;
+    }
+
+    function startGame() {
+      isGameRunning = true;
+      startTime = Date.now();
+      gameLoop();
+    }
+
+    function resetBall() {
+      ball.x = canvas.width / 2;
+      ball.y = canvas.height / 2;
+      ball.speedX = gameDifficulty === 'easy' ? 5 : 7;
+      ball.speedY = gameDifficulty === 'easy' ? 5 : 7;
+      lives--;
+
+      if (lives <= 0) {
+        endGame();
+      }
+    }
+
+    function endGame() {
+      isGameRunning = false;
+      elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+      const score = elapsedTime * 10; // Example score calculation based on time played
+      submitScore(score);
+      alert(`Game Over! Your score is ${score}`);
+    }
+
+    function toggleDifficulty() {
+      gameDifficulty = gameDifficulty === 'easy' ? 'hard' : 'easy';
+      document.getElementById('toggleDifficulty').innerText = `Difficulty: ${gameDifficulty.charAt(0).toUpperCase() + gameDifficulty.slice(1)}`;
+    }
+
+    function gameLoop() {
+      if (!isGameRunning) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Ball
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = ball.color;
+      ctx.fill();
+      ctx.closePath();
+
+      // Draw Paddles
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+
+      ctx.fillStyle = computer.color;
+      ctx.fillRect(computer.x, computer.y, computer.width, computer.height);
+
+      // Move Ball
+      ball.x += ball.speedX;
+      ball.y += ball.speedY;
+
+      // Wall Collision
+      if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+        ball.speedY = -ball.speedY;
+      }
+
+      // Paddle Collision
+      if (
+        (ball.x - ball.radius < player.x + player.width && ball.y > player.y && ball.y < player.y + player.height) ||
+        (ball.x + ball.radius > computer.x && ball.y > computer.y && ball.y < computer.y + computer.height)
+      ) {
+        ball.speedX = -ball.speedX;
+      }
+
+      // Scoring
+      if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+        resetBall();
+      }
+
+      // Computer AI
+      const computerSpeed = gameDifficulty === 'easy' ? 0.1 : 0.2;
+      computer.y += (ball.y - (computer.y + computer.height / 2)) * computerSpeed;
+
+      // Redraw
+      requestAnimationFrame(gameLoop);
+    }
+
+    function submitScore(score) {
+      window.parent.postMessage({ type: 'submit-score', score: score }, '*');
+    }
+
+    // Control Player Paddle
+    window.addEventListener('keydown', (event) => {
+      if (!isGameRunning) return;
+      const key = event.key;
+      if (key === 'ArrowUp') {
+        player.y = Math.max(0, player.y - 20);
+      } else if (key === 'ArrowDown') {
+        player.y = Math.min(canvas.height - player.height, player.y + 20);
+      }
+    });
+
+    document.getElementById('startGame').addEventListener('click', startGame);
+    document.getElementById('restartGame').addEventListener('click', initializeGame);
+    document.getElementById('toggleDifficulty').addEventListener('click', toggleDifficulty);
+
+    initializeGame();
+  </script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pong Game</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      background-color: #0a0a0a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      font-family: 'Press Start 2P', cursive;
+      color: #fff;
+    }
+
+    @font-face {
+      font-family: 'Press Start 2P';
+      src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    }
+
+    canvas {
+      background-color: #1a1a1a;
+      border: 3px solid #f39c12;
+      box-shadow: 0px 0px 20px #f39c12;
+    }
+
+    #controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #e74c3c;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .button:hover {
+      background-color: #c0392b;
+    }
+
+    #scoreDisplay {
+      margin-top: 20px;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="pongCanvas" width="800" height="400"></canvas>
+  <div id="controls">
+    <button class="button" id="startGame">Start Game</button>
+    <button class="button" id="restartGame">Restart Game</button>
+    <button class="button" id="toggleDifficulty">Difficulty: Easy</button>
+  </div>
+  <div id="scoreDisplay"></div>
+
+  <script>
+    const canvas = document.getElementById('pongCanvas');
+    const ctx = canvas.getContext('2d');
+    let ball, player, computer, isGameRunning, gameDifficulty, lives, startTime, elapsedTime;
+
+    function initializeGame() {
+      ball = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 10,
+        speedX: 5,
+        speedY: 5,
+        color: "#f39c12"
+      };
+
+      const paddleWidth = 10;
+      const paddleHeight = 100;
+
+      player = { x: 10, y: (canvas.height - paddleHeight) / 2, width: paddleWidth, height: paddleHeight, color: "#ecf0f1" };
+      computer = { x: canvas.width - paddleWidth - 10, y: (canvas.height - paddleHeight) / 2, width: paddleWidth, height: paddleHeight, color: "#ecf0f1" };
+
+      isGameRunning = false;
+      gameDifficulty = 'easy';
+      lives = 3;
+      startTime = 0;
+      elapsedTime = 0;
+
+      document.getElementById('toggleDifficulty').innerText = `Difficulty: Easy`;
+      document.getElementById('scoreDisplay').innerText = '';
+    }
+
+    function startGame() {
+      isGameRunning = true;
+      startTime = Date.now();
+      gameLoop();
+    }
+
+    function resetBall() {
+      ball.x = canvas.width / 2;
+      ball.y = canvas.height / 2;
+      ball.speedX = gameDifficulty === 'easy' ? 5 : 7;
+      ball.speedY = gameDifficulty === 'easy' ? 5 : 7;
+      lives--;
+
+      if (lives <= 0) {
+        endGame();
+      }
+    }
+
+    function endGame() {
+      isGameRunning = false;
+      elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+      const score = elapsedTime * 10; // Example score calculation based on time played
+      submitScore(score);
+      document.getElementById('scoreDisplay').innerText = `Game Over! Your Score: ${score}`;
+    }
+
+    function toggleDifficulty() {
+      gameDifficulty = gameDifficulty === 'easy' ? 'hard' : 'easy';
+      document.getElementById('toggleDifficulty').innerText = `Difficulty: ${gameDifficulty.charAt(0).toUpperCase() + gameDifficulty.slice(1)}`;
+    }
+
+    function gameLoop() {
+      if (!isGameRunning) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Ball
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = ball.color;
+      ctx.fill();
+      ctx.closePath();
+
+      // Draw Paddles
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+
+      ctx.fillStyle = computer.color;
+      ctx.fillRect(computer.x, computer.y, computer.width, computer.height);
+
+      // Move Ball
+      ball.x += ball.speedX;
+      ball.y += ball.speedY;
+
+      // Wall Collision
+      if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+        ball.speedY = -ball.speedY;
+      }
+
+      // Paddle Collision
+      if (
+        (ball.x - ball.radius < player.x + player.width && ball.y > player.y && ball.y < player.y + player.height) ||
+        (ball.x + ball.radius > computer.x && ball.y > computer.y && ball.y < computer.y + computer.height)
+      ) {
+        ball.speedX = -ball.speedX;
+      }
+
+      // Scoring
+      if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+        resetBall();
+      }
+
+      // Computer AI
+      const computerSpeed = gameDifficulty === 'easy' ? 0.1 : 0.2;
+      computer.y += (ball.y - (computer.y + computer.height / 2)) * computerSpeed;
+
+      // Redraw
+      requestAnimationFrame(gameLoop);
+    }
+
+    function submitScore(score) {
+      window.parent.postMessage({ type: 'submit-score', score: score }, '*');
+    }
+
+    // Control Player Paddle
+    window.addEventListener('keydown', (event) => {
+      if (!isGameRunning) return;
+      const key = event.key;
+      if (key === 'ArrowUp') {
+        player.y = Math.max(0, player.y - 20);
+      } else if (key === 'ArrowDown') {
+        player.y = Math.min(canvas.height - player.height, player.y + 20);
+      }
+    });
+
+    document.getElementById('startGame').addEventListener('click', startGame);
+    document.getElementById('restartGame').addEventListener('click', initializeGame);
+    document.getElementById('toggleDifficulty').addEventListener('click', toggleDifficulty);
+
+    initializeGame();
+  </script>
+</body>
+</html>
